@@ -1973,3 +1973,34 @@ div[style*="display: flex; flex-wrap: wrap; gap: 10px; margin-top: 8px;"]>* {
     padding-bottom: 40px !important;
     /* iPhone/Android alt kaydırma çubuğunun üstüne kaldırır */
 }
+
+@media (max-width: 576px) {
+    .swal2-popup {
+        width: 85% !important;
+        /* Ekrana tam yapışmasın, kenarlardan nefes alsın */
+        padding: 1.5em !important;
+        border-radius: 20px !important;
+        /* Apple tarzı daha yumuşak köşeler */
+        box-shadow: 0 15px 30px rgba(0, 0, 0, 0.15) !important;
+    }
+
+    .swal2-title {
+        font-size: 1.3rem !important;
+        /* Yazı fontunu mobilde sırıtmayacak şekilde küçültür */
+    }
+
+    .swal2-html-container {
+        font-size: 0.95rem !important;
+    }
+
+    .swal2-actions {
+        width: 100% !important;
+    }
+
+    .swal2-confirm,
+    .swal2-cancel {
+        width: 100% !important;
+        /* Mobilde butonları alt alta veya tam genişlikte daha rahat basılır yapar */
+        margin: 5px 0 !important;
+    }
+}
