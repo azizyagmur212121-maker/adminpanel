@@ -1,0 +1,450 @@
+<!DOCTYPE html>
+<html lang="tr">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard | İşletme Paneli</title>
+    <link rel="stylesheet" href="css/dashboard.css">
+    <link rel="manifest" href="manifest.json">
+    <meta name="theme-color" content="#ffffff">
+    <link rel="apple-touch-icon" href="https://cdn-icons-png.flaticon.com/512/2838/2838779.png">
+
+    <!-- LEAFLET (HARİTA) CSS KÜTÜPHANESİ -->
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+</head>
+
+<body>
+
+    <div id="sidebar-overlay" class="sidebar-overlay"></div>
+
+    <aside class="sidebar" id="sidebar">
+        <div class="sidebar-header">
+            <div class="modern-logo mini-logo">
+                <div class="logo-top"></div>
+                <div class="logo-body">
+                    <div class="logo-dot"></div>
+                    <div class="logo-dot"></div>
+                    <div class="logo-line"></div>
+                </div>
+            </div>
+            <h2 class="sidebar-title">İşletme Paneli</h2>
+        </div>
+
+        <ul class="nav-links">
+            <li class="active"><a href="#" data-target="section-overview"><span class="icon">📊</span> <span
+                        class="text">Özet Ekranı</span></a></li>
+            <li><a href="#" data-target="section-appointments"><span class="icon">🗓️</span> <span
+                        class="text">Randevular</span></a></li>
+            <li><a href="#" data-target="section-clients"><span class="icon">👥</span> <span
+                        class="text">Müşteriler</span></a></li>
+            <li><a href="#" data-target="section-reviews"><span class="icon">⭐</span> <span
+                        class="text">Değerlendirmeler</span></a></li>
+            <li><a href="#" data-target="section-settings"><span class="icon">⚙️</span> <span class="text">İşletme
+                        Ayarları</span></a></li>
+        </ul>
+        <div class="sidebar-footer">
+            <button id="logout-btn" class="logout-btn"><span class="icon">🚪</span> <span class="text">Çıkış
+                    Yap</span></button>
+        </div>
+    </aside>
+
+    <main class="main-content">
+        <header class="topbar">
+            <div class="topbar-left">
+                <button id="sidebar-toggle" class="menu-toggle-btn">
+                    <svg viewBox="0 0 24 24" width="24" height="24" stroke="currentColor" stroke-width="2" fill="none"
+                        stroke-linecap="round" stroke-linejoin="round">
+                        <line x1="3" y1="12" x2="21" y2="12"></line>
+                        <line x1="3" y1="6" x2="21" y2="6"></line>
+                        <line x1="3" y1="18" x2="21" y2="18"></line>
+                    </svg>
+                </button>
+                <div class="welcome-text">
+                    <h1>Hoş Geldin, <span id="business-name" class="neon-text">Yükleniyor...</span></h1>
+                    <p class="subtitle">İşler nasıl gidiyor?</p>
+                </div>
+            </div>
+            <div class="user-profile">
+                <button id="enable-notifications-btn" class="secondary-btn"
+                    style="background:#f0fdf4; border-color:#22c55e; color:#16a34a; font-weight:bold;">🔔 Bildirimleri
+                    Aç</button>
+                <button id="copy-link-btn" class="copy-link-btn" title="Müşterilerine göndereceğin linki kopyala">🔗
+                    Linkimi Kopyala</button>
+                <div class="profile-pic" id="profile-initial">?</div>
+            </div>
+        </header>
+
+        <div id="content-area" class="content-area">
+
+            <!-- 1. ÖZET EKRANI -->
+            <section id="section-overview" class="content-section active">
+
+                <div class="quick-actions-row">
+                    <button class="quick-action-btn"
+                        onclick="document.querySelector('[data-target=\'section-appointments\']').click();">
+                        <span class="action-icon">➕</span> Yeni Randevu Ekle
+                    </button>
+                    <button class="quick-action-btn"
+                        onclick="document.querySelector('[data-target=\'section-clients\']').click();">
+                        <span class="action-icon">👥</span> Rehberi Görüntüle
+                    </button>
+                    <button class="quick-action-btn"
+                        onclick="document.querySelector('[data-target=\'section-settings\']').click();">
+                        <span class="action-icon">⚙️</span> Ayarlara Git
+                    </button>
+                </div>
+
+                <div class="stats-grid">
+                    <div class="glass-card stat-card">
+                        <div class="stat-icon">📅</div>
+                        <div class="stat-info">
+                            <h4>Bugünkü Randevular</h4><span id="stat-today" class="neon-text">0</span>
+                        </div>
+                    </div>
+                    <div class="glass-card stat-card">
+                        <div class="stat-icon">🔔</div>
+                        <div class="stat-info">
+                            <h4>Bekleyen Onaylar</h4><span id="stat-pending" class="text-warning">0</span>
+                        </div>
+                    </div>
+                    <div class="glass-card stat-card">
+                        <div class="stat-icon">📈</div>
+                        <div class="stat-info">
+                            <h4>Bu Ayki Randevular</h4><span id="stat-monthly" style="color: #10b981;">0</span>
+                        </div>
+                    </div>
+                    <div class="glass-card stat-card">
+                        <div class="stat-icon">👥</div>
+                        <div class="stat-info">
+                            <h4>Toplam Müşteri</h4><span id="stat-clients" style="color: #ef4444;">0</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="overview-split-layout">
+                    <div class="glass-card chart-card">
+                        <h4>📊 Aylık Randevu Yoğunluğu</h4>
+                        <div class="chart-container"><canvas id="overviewChart"></canvas></div>
+                    </div>
+
+                    <div class="glass-card upcoming-card">
+                        <h4>⏳ Yaklaşan Randevular</h4>
+                        <p class="text-muted" style="font-size:0.85rem; margin-bottom: 15px;">Önümüzdeki günlerin
+                            onaylanmış randevuları.</p>
+                        <div id="upcoming-list" class="upcoming-list">
+                            <p class="empty-list">Yaklaşan randevu yok.</p>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- 2. RANDEVULAR -->
+            <section id="section-appointments" class="content-section">
+                <h3>🗓️ Randevu Yönetimi</h3>
+
+                <div id="personnel-filter-container" class="glass-card"
+                    style="margin-bottom: 20px; display: none; padding: 15px 25px;">
+                    <label style="color:var(--text-main); font-weight:700; margin-bottom:8px; display:block;">Takvimi
+                        Filtrele (Personel Seçimi)</label>
+                    <select id="appointment-personnel-filter" class="modern-select"
+                        style="margin-top:0; border-color:var(--primary); color:var(--primary); font-weight:600;">
+                        <option value="all">Genel Görünüm (Tüm İşletme)</option>
+                    </select>
+                </div>
+
+                <div class="appointments-layout">
+                    <div class="calendar-side">
+                        <div class="date-selector-wrapper">
+                            <div class="date-selector">
+                                <button id="prev-day-btn" class="date-nav-btn">◀</button>
+                                <div class="date-display-group">
+                                    <span id="formatted-date-display">Tarih Yükleniyor...</span>
+                                    <input type="date" id="calendar-date" class="hidden-date-input">
+                                </div>
+                                <button id="next-day-btn" class="date-nav-btn">▶</button>
+                            </div>
+                        </div>
+                        <div class="glass-card calendar-card">
+                            <div class="calendar-status" id="calendar-status-text">Tarih seçin...</div>
+                            <div id="slots-container" class="slots-grid"></div>
+                        </div>
+                    </div>
+                    <div class="lists-side">
+                        <div class="glass-card list-card">
+                            <h4 class="list-title text-warning">🔔 Onay Bekleyenler</h4>
+                            <div id="pending-list" class="appointment-list">
+                                <p class="empty-list">Yükleniyor...</p>
+                            </div>
+                        </div>
+                        <div class="glass-card list-card mt-20">
+                            <h4 class="list-title text-success">📋 <span id="selected-date-list-title">Bugünün</span>
+                                Randevuları</h4>
+                            <div id="confirmed-list" class="appointment-list">
+                                <p class="empty-list">Yükleniyor...</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- 3. MÜŞTERİLER -->
+            <section id="section-clients" class="content-section">
+                <div class="clients-toolbar">
+                    <h3>👥 Müşteri Rehberi</h3>
+                    <input type="text" id="client-search-input" class="modern-input search-input"
+                        placeholder="İsim veya Telefon Ara...">
+                </div>
+                <div class="glass-card">
+                    <div id="clients-container" class="clients-list">
+                        <p class="empty-list">Müşteri verisi yükleniyor...</p>
+                    </div>
+                </div>
+            </section>
+
+            <!-- 4. YORUMLAR -->
+            <section id="section-reviews" class="content-section">
+                <div class="settings-header">
+                    <h3>⭐ Müşteri Yorumları ve Puanlar</h3>
+                </div>
+                <p class="text-muted" style="margin-bottom: 20px;">İşletmenize ve personellerinize yapılan
+                    değerlendirmeler aşağıdadır. Küfür/Hakaret içeren yorumları sistem yöneticisine bildirebilirsiniz.
+                </p>
+
+                <div class="stats-grid" style="margin-bottom: 20px;">
+                    <div class="glass-card stat-card">
+                        <div class="stat-icon" style="text-shadow: 0 0 15px rgba(245,158,11,0.5);">⭐</div>
+                        <div class="stat-info">
+                            <h4>Genel İşletme Puanı</h4><span id="stat-rating" style="color: #f59e0b;">0.0</span>
+                        </div>
+                    </div>
+                    <div class="glass-card stat-card">
+                        <div class="stat-icon" style="text-shadow: 0 0 15px rgba(14,165,233,0.5);">💬</div>
+                        <div class="stat-info">
+                            <h4>Toplam Değerlendirme</h4><span id="stat-review-count" class="neon-text">0</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="glass-card">
+                    <div id="reviews-container" class="reviews-grid">
+                        <p class="empty-list" style="grid-column: 1/-1;">Henüz hiç yorum almadınız.</p>
+                    </div>
+                </div>
+            </section>
+
+            <!-- 5. İŞLETME AYARLARI -->
+            <section id="section-settings" class="content-section">
+                <div class="settings-header">
+                    <h3>⚙️ İşletme Ayarları</h3>
+                </div>
+
+                <div class="glass-card profile-progress-card">
+                    <div class="progress-header"><span>Profil Doluluk Oranı</span><span id="progress-text"
+                            class="neon-text">%50</span></div>
+                    <div class="progress-bar-bg">
+                        <div class="progress-bar-fill" id="progress-fill" style="width: 50%;"></div>
+                    </div>
+                </div>
+
+                <div class="glass-card accordion-card" style="margin-bottom: 20px;">
+                    <div class="accordion-header" id="profile-accordion-btn">
+                        <h4>🏢 İşletme Profil Bilgileri</h4><span class="accordion-icon" id="accordion-icon">▼</span>
+                    </div>
+                    <div class="accordion-content" id="profile-accordion-content">
+                        <div class="profile-form-grid">
+                            <div class="logo-upload-group">
+                                <div class="logo-preview" id="logo-preview"><span id="logo-placeholder">Logo</span>
+                                </div>
+                                <input type="file" id="logo-upload" accept="image/*" hidden>
+                                <button class="secondary-btn" id="trigger-logo-btn">Görsel Seç</button>
+                            </div>
+                            <div class="profile-inputs">
+                                <div class="input-group"><label>İşletme Adı</label><input type="text" id="setting-bname"
+                                        class="modern-input"></div>
+                                <div class="input-group"><label>Telefon Numarası</label><input type="tel"
+                                        id="setting-phone" class="modern-input"></div>
+                                <div class="input-group full-width"><label>Açık Adres</label><textarea
+                                        id="setting-address" class="modern-input" rows="2"
+                                        placeholder="Müşterilerin sizi bulabilmesi için açık adresiniz..."></textarea>
+                                </div>
+
+                                <div class="input-group full-width"
+                                    style="border: 1px solid var(--border-light); padding: 15px; border-radius: 10px; background: #f8fafc; margin-bottom: 20px;">
+                                    <div
+                                        style="display:flex; justify-content:space-between; align-items:center; margin-bottom: 10px;">
+                                        <label style="margin:0; font-weight:700;">🗺️ Haritadaki Konumunuz</label>
+                                        <button type="button" id="find-me-btn"
+                                            style="background:#e0f2fe; border:1px solid #0ea5e9; color:#0284c7; padding:5px 12px; border-radius:6px; font-weight:bold; cursor:pointer; font-size:0.8rem; transition:0.2s;">📍
+                                            GPS ile Bul</button>
+                                    </div>
+                                    <p class="text-muted" style="font-size:0.8rem; margin-bottom:10px;">Haritaya
+                                        tıklayarak veya kırmızı iğneyi sürükleyerek işletmenizin kapısını tam olarak
+                                        işaretleyin. Müşteriler bu noktaya yol tarifi alacak.</p>
+                                    <div id="business-map"
+                                        style="height: 250px; width: 100%; border-radius: 8px; border: 1px solid #cbd5e1; z-index: 1;">
+                                    </div>
+                                </div>
+
+                                <div class="input-group full-width"><button id="save-profile-btn"
+                                        class="primary-btn">Profili Güncelle</button></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- YENİ: ŞİFRE DEĞİŞTİRME KARTI (AKORDİYONDAN ÇIKARILDI) -->
+                <div class="glass-card" style="margin-bottom: 20px;">
+                    <h4>🔒 Şifre Değiştirme</h4>
+                    <p class="text-muted" style="font-size:0.85rem; margin-bottom: 15px;">Panel giriş şifrenizi
+                        güvenliğiniz için belirli aralıklarla güncelleyin.</p>
+
+                    <div style="display: flex; flex-wrap: wrap; gap: 15px; margin-bottom: 15px;">
+                        <div style="flex: 1; min-width: 200px;">
+                            <label
+                                style="display:block; margin-bottom:5px; color:var(--text-muted); font-size:0.85rem;">Mevcut
+                                Şifre</label>
+                            <input type="password" id="setting-old-pass" class="modern-input"
+                                placeholder="Şu anki şifreniz" style="margin-bottom: 0;">
+                        </div>
+                        <div style="flex: 1; min-width: 200px;">
+                            <label
+                                style="display:block; margin-bottom:5px; color:var(--text-muted); font-size:0.85rem;">Yeni
+                                Şifre</label>
+                            <input type="password" id="setting-new-pass" class="modern-input"
+                                placeholder="En az 6 karakter" style="margin-bottom: 0;">
+                        </div>
+                    </div>
+
+                    <button id="save-password-btn" class="secondary-btn"
+                        style="color: #ef4444; border-color: #ef4444; width: auto; padding: 10px 25px;">Şifreyi
+                        Güncelle</button>
+                </div>
+
+                <div class="settings-grid">
+
+                    <div class="glass-card gallery-card" style="grid-column: 1 / -1;">
+                        <div
+                            style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; margin-bottom:10px;">
+                            <h4>🖼️ İşletme Galerisi (Portfolyo)</h4>
+                            <span id="gallery-count"
+                                style="background:#e0f2fe; color:#0284c7; padding:4px 8px; border-radius:6px; font-size:0.85rem; font-weight:bold;">0/10</span>
+                        </div>
+                        <p class="text-muted" style="font-size:0.85rem; margin-bottom: 15px;">Müşterilerinize mekanınızı
+                            veya yaptığınız işleri gösterin. Maksimum 10 fotoğraf yükleyebilirsiniz.</p>
+
+                        <div style="margin-bottom: 15px;">
+                            <input type="file" id="gallery-upload" accept="image/*" style="display:none;">
+                            <button id="trigger-gallery-btn" class="secondary-btn"
+                                style="width: auto; padding: 8px 20px; background: #f0fdf4; border-color: #22c55e; color: #16a34a;">+
+                                Fotoğraf Ekle</button>
+                        </div>
+
+                        <div id="gallery-grid" class="gallery-grid">
+                            <p class="empty-list" style="grid-column: 1/-1;">Henüz galeriye fotoğraf eklemediniz.</p>
+                        </div>
+                    </div>
+
+                    <div class="glass-card duration-card">
+                        <div class="card-title-row">
+                            <h4>💆‍♀️ Hizmetler ve Fiyat Listesi</h4>
+                            <button id="save-settings-btn" class="primary-btn">Tüm Ayarları Kaydet</button>
+                        </div>
+                        <p class="text-muted" style="font-size:0.85rem; margin-bottom: 15px;">Müşterilerinize sunduğunuz
+                            hizmetleri, sürelerini ve fiyatlarını belirleyin.</p>
+
+                        <label
+                            style="color:var(--text-main); font-size:0.9rem; font-weight:600; display:block; margin-bottom: 8px;">Takvim
+                            Slot Aralığı (Takvim kaç dakikada bir bölünsün?)</label>
+                        <select id="appointment-duration" class="modern-select"
+                            style="margin-top:0; margin-bottom: 20px;">
+                            <option value="15">15 Dakika</option>
+                            <option value="30" selected>30 Dakika</option>
+                            <option value="60">1 Saat</option>
+                        </select>
+
+                        <label style="color:var(--text-main); font-size:0.9rem; font-weight:600; display:block;">Hizmet
+                            Ekle</label>
+                        <div style="display: flex; flex-wrap: wrap; gap: 10px; margin-top: 8px;">
+                            <input type="text" id="new-service-name" class="modern-input" placeholder="Hizmet Adı"
+                                style="flex: 2; min-width: 150px;">
+                            <input type="number" id="new-service-duration" class="modern-input" placeholder="Süre (Dk)"
+                                style="flex: 1; min-width: 90px;" step="5" min="5">
+                            <input type="number" id="new-service-price" class="modern-input" placeholder="Fiyat (₺)"
+                                style="flex: 1; min-width: 90px;" min="0">
+                            <button id="add-service-btn" class="secondary-btn"
+                                style="width: auto; padding: 0 20px; background: #f0fdf4; border-color: #22c55e; color: #16a34a;">+
+                                Ekle</button>
+                        </div>
+                        <div id="services-list" class="breaks-container" style="margin-top:15px; padding-left:0;"></div>
+                    </div>
+
+                    <div class="glass-card schedule-card">
+                        <h4>💇‍♀️ Personel Yönetimi</h4>
+                        <p class="text-muted" style="font-size:0.85rem; margin-bottom: 15px;">İşletmenizde çalışan
+                            personelleri ekleyin. Mesai saatlerini ve verebildikleri hizmetleri belirleyin.</p>
+
+                        <div
+                            style="background: #f0f9ff; border: 1px dashed #7dd3fc; padding: 15px; border-radius: 10px; margin-bottom: 20px; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 10px;">
+                            <div>
+                                <span
+                                    style="display: block; font-size: 0.8rem; color: #0284c7; font-weight: 700; text-transform: uppercase;">Personellerinizin
+                                    Panele Giriş Kodu:</span>
+                                <span id="display-business-slug"
+                                    style="font-size: 1.3rem; font-weight: 800; color: #0369a1; letter-spacing: 1px;">Yükleniyor...</span>
+                            </div>
+                            <button id="copy-slug-btn"
+                                style="background: #fff; border: 1px solid #38bdf8; color: #0284c7; padding: 8px 15px; border-radius: 8px; font-weight: 600; cursor: pointer; transition: 0.2s; font-size: 0.85rem;">📋
+                                Kopyala</button>
+                        </div>
+
+                        <div style="display: flex; gap: 10px; margin-top: 10px;">
+                            <input type="text" id="new-personnel-name" class="modern-input" placeholder="Personel Adı"
+                                style="flex:2;">
+                            <input type="text" id="new-personnel-pin" class="modern-input"
+                                placeholder="Giriş PIN (4 Hane)" maxlength="4" style="flex:1;">
+                            <button id="add-personnel-btn" class="secondary-btn"
+                                style="width: auto; padding: 0 20px; background: #e0f2fe; border-color: #0ea5e9; color: #0284c7;">+
+                                Personel Ekle</button>
+                        </div>
+
+                        <div id="personnel-list" class="personnel-grid">
+                            <p class="empty-list" style="grid-column: 1/-1;">Henüz personel eklemediniz.</p>
+                        </div>
+                    </div>
+
+                    <div class="glass-card schedule-card">
+                        <h4>🏖️ İşletme Tatil Günleri</h4>
+                        <p class="text-muted" style="font-size:0.85rem;">İşletmenin komple kapalı olduğu günleri
+                            belirleyin (Bayram, resmi tatil vb.)</p>
+                        <div style="display: flex; gap: 10px; margin-top: 10px;">
+                            <input type="date" id="new-holiday-date" class="modern-input" style="width: auto;">
+                            <button id="add-holiday-btn" class="secondary-btn"
+                                style="width: auto; padding: 0 20px;">Tarihi Kapat</button>
+                        </div>
+                        <div id="holidays-list" class="breaks-container" style="margin-top:15px; padding-left:0;"></div>
+                    </div>
+
+                    <div class="glass-card schedule-card">
+                        <h4>🗓️ Genel Haftalık Çalışma Planı</h4>
+                        <p class="text-muted" style="font-size:0.85rem; margin-bottom: 15px;">İşletmenin standart açılış
+                            ve kapanış saatleri.</p>
+                        <div id="schedule-container" class="schedule-container"></div>
+                    </div>
+
+                </div>
+            </section>
+        </div>
+    </main>
+
+    <!-- LEAFLET (HARİTA) JS KÜTÜPHANESİ -->
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script type="module" src="js/dashboard.js"></script>
+    <audio id="notification-bell" src="https://assets.mixkit.co/active_storage/sfx/2869/2869-preview.mp3"
+        preload="auto"></audio>
+</body>
+
+</html>

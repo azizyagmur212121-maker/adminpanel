@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="tr">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>İşletme Girişi | Admin Panel</title>
+    <link rel="stylesheet" href="css/style.css">
+</head>
+
+<body>
+    <div id="splash-screen" class="splash-screen">
+        <div class="modern-logo pulse-anim">
+            <div class="logo-top"></div>
+            <div class="logo-body">
+                <div class="logo-dot"></div>
+                <div class="logo-dot"></div>
+                <div class="logo-dot"></div>
+                <div class="logo-line"></div>
+            </div>
+        </div>
+    </div>
+
+    <div class="shape shape-1"></div>
+    <div class="shape shape-2"></div>
+    <div class="shape shape-3"></div>
+    <div class="shape shape-4"></div>
+    <div class="shape shape-5"></div>
+    <div class="shape shape-6"></div>
+
+    <div class="login-container">
+        <div class="modern-logo float-logo">
+            <div class="logo-top"></div>
+            <div class="logo-body">
+                <div class="logo-dot"></div>
+                <div class="logo-dot"></div>
+                <div class="logo-dot"></div>
+                <div class="logo-line"></div>
+            </div>
+        </div>
+
+        <h2>Sisteme Giriş</h2>
+        <p class="subtitle" style="margin-bottom: 20px;">Lütfen giriş türünüzü seçin</p>
+
+        <!-- YENİ: GİRİŞ TÜRÜ SEKMELERİ -->
+        <div class="login-tabs">
+            <button type="button" class="tab-btn active" id="tab-admin">İşletme Sahibi</button>
+            <button type="button" class="tab-btn" id="tab-personnel">Personel</button>
+        </div>
+
+        <!-- İŞLETME SAHİBİ FORMU -->
+        <form id="login-form">
+            <div class="input-group">
+                <input type="email" id="email" required placeholder=" ">
+                <label for="email">E-posta Adresi</label>
+            </div>
+            <div class="input-group">
+                <input type="password" id="password" required placeholder=" ">
+                <label for="password">Şifre</label>
+            </div>
+            <div class="forgot-password">
+                <a href="#" id="forgot-password-link">Şifremi unuttum</a>
+            </div>
+            <button type="submit" id="submit-btn">Yönetici Girişi</button>
+        </form>
+
+        <!-- PERSONEL FORMU (Başlangıçta Gizli) -->
+        <form id="personnel-form" class="hidden">
+            <div class="input-group">
+                <input type="text" id="p-slug" required placeholder=" ">
+                <label for="p-slug">İşletme Kodu</label>
+            </div>
+            <div class="input-group">
+                <input type="text" id="p-name" required placeholder=" ">
+                <label for="p-name">Personel Adınız</label>
+            </div>
+            <div class="input-group">
+                <input type="password" id="p-pin" required placeholder=" " maxlength="4">
+                <label for="p-pin">4 Haneli PIN Kodu</label>
+            </div>
+            <button type="submit" id="p-submit-btn" style="background:#10b981;">Personel Girişi</button>
+        </form>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script type="module" src="js/login.js"></script>
+</body>
+
+</html>
