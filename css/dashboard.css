@@ -1952,3 +1952,24 @@ div[style*="display: flex; flex-wrap: wrap; gap: 10px; margin-top: 8px;"]>* {
         margin-bottom: 0;
     }
 }
+
+/* 1. Çıkış Yap Butonunu Alt Bardaki Kaydırma Çizgisinden Kurtarma */
+.sidebar {
+    height: 100dvh !important;
+    /* Dinamik Viewport: Telefonun alt barını otomatik hesaplar */
+    display: flex;
+    flex-direction: column;
+}
+
+.nav-links {
+    flex: 1;
+    /* Menüyü esnetip Çıkış Yap butonunu en alta iter */
+    overflow-y: auto;
+    /* Ekran çok küçükse menü kendi içinde kaysın */
+}
+
+.sidebar-footer {
+    margin-top: auto;
+    padding-bottom: 40px !important;
+    /* iPhone/Android alt kaydırma çubuğunun üstüne kaldırır */
+}
